@@ -1,0 +1,41 @@
+= OpenAPI Specification Intro
+
+Mit Springboot und IntelliJ. Diese Übung baut auf der letzten `bbw-320-restintro` auf.
+
+Weshalb OAS: https://blog.apideck.com/introduction-to-openapi-specification
+
+== Ziele
+
+1. Sie schreiben selbst einen API-Contract gemäss OpenAPI Standard (OAS 3.0.3).
+2. Sie erweitern eine bestehende OpenAPI Spezifikation entsprechend dem bestehenden Code
+
+== OAS Tutorial
+
+1. Studiere den Code in `PonyController`. Zusätzlich vorhanden ist eine `@CrossOrigin`-Annotation für CORS-Support. Starte den Server und schreibe die `.http`-Requests fertig.
+2. Gewinne eine Übersicht über den Sinn von OAS auf https://www.wallarm.com/what/what-is-openapi
+3. Schau dir den Beginn der OpenAPI Spezifikation in `openapi-spec.yaml` an.
+   * IntelliJ hat built-in OpenAPI-Support und zeigt eine klickbare UI Alternative.
+   * Alternativ kann es ein .http-Request-Snipped erstellen (linker Rand)
+   * Alternativ kann auch der Online Swagger Editor genutzt werden: https://editor.swagger.io/
+4. Als ersten Endpunkt schreiben wir den `GET /api/ponies`:
+   * Erstelle einen neuen `/api/ponies:` Endpunkt unter `paths:` (das ist ein `get:`).
+     Siehe https://swagger.io/docs/specification/paths-and-operations/
+   * Definiere das `PonyDto` unter `components.schemas.PonyDto` ähnlich wie `SampleError`.
+       Siehe `Objects` in https://swagger.io/docs/specification/data-models/data-types/
+   * Definiere die Response (ein 200er `application/json`). In diesem Fall ist die Response ein `array` (eine Liste von `PonyDto`).
++
+[source,yaml]
+----
+application/json:
+    schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/PonyDto'
+----
+   * Siehe `Reusing Responses` in https://swagger.io/docs/specification/describing-responses/
+5. Wir wollen nun alle weiteren Operationen definieren und testen (`POST /api/ponies` usw). Weitere Hilfestellungen:
+   * Ein allgemeines OAS 3.0 Tutorial: https://support.smartbear.com/swaggerhub/docs/tutorials/openapi-3-tutorial.html
+   * Eine grosse Beispielspezifikation: https://petstore3.swagger.io/ sowie das yaml: https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml
+   * OpenApi Spezifikation 3.0.3 (das ist nicht die Neuste): https://swagger.io/specification/v3/ +
+      Spezifikationen sind meist schwierig zu lesen, wichtig sind vorerst: `Paths Object`, `Path Item Object`, `Operation Object` und `Components Object`. Besonders hilfreich sind die yaml-Beispiele und `Ctrl-F`.
+   * Validiere die Spec mit dem `openApiValidate`-task im `build.gradle`.

@@ -1,0 +1,43 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.5'
+	id 'io.spring.dependency-management' version '1.1.6'
+	id 'org.openapi.generator' version '7.9.0'
+}
+
+group = 'ch.bbw.m320'
+version = '0.0.0-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
+}
+
+openApiValidate {
+	inputSpec = file("openapi-spec.yaml").absolutePath
+}
+
+tasks.openApiValidate {
+	inputs.file file("openapi-spec.yaml")
+	outputs.file file("build/marker")
+	doLast { file("build/marker").text = "" }
+}
+
+test {
+	dependsOn tasks.openApiValidate
+	jvmArgs "-XX:+EnableDynamicAgentLoading"
+	useJUnitPlatform()
+}
+
+tasks.openApiGenerate.enabled = false

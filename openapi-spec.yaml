@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  version: 0.0.1
+  title: REST Intro Sample Application
+  description: A small sample API to grasp the basics of the OpenAPI Specification
+servers:
+  - url: http://localhost:8080
+
+paths:
+  # https://swagger.io/specification/#paths-object
+  /api/ping:
+    # https://swagger.io/specification/#path-item-object
+    get:
+      # https://swagger.io/specification/#operation-object
+      summary: Returns a simple pong to check if the service is alive
+      operationId: ping
+      responses:
+        200:
+          # https://swagger.io/specification/#response-object
+          description: Simply the string `pong`
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+                # just one constant value (usually an enum contains multiple values)
+                enum:
+                  - pong
+        default:
+          description: A sample error mainly here to give a sample on how to use components
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SampleError"
+  /api/pony:
+    get:
+      responses:
+        200:
+          description: got some ponies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PonyDto"
+    post:
+      responses:
+        200:
+          description: made a new pony
+          content:
+            text/plain:
+              schema:
+                type: string
+        400:
+          description: couldnt make a new pony
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NoUglyPoniesException"
+
+# components contain reusable definitions
+# https://swagger.io/specification/#components-object
+components:
+  schemas:
+    PonyDto:
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+    NoUglyPoniesException:
+      properties:
+        message:
+          type: string
+    SampleError:
+      description: Sample springboot error
+      properties:
+        timestamp:
+          type: string
+          example: 2022-02-28T14:13:56.466
+          format: date-time
+        status:
+          type: number
+          example: 404
+        error:
+          type: string
+          example: Not Found
+        path:
+          type: string
+          example: /api/nonexistent
+          pattern: "/.+"
