@@ -8,6 +8,9 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import ch.bbw.m320.restintro.ArticleController.ArticleDto;
+import ch.bbw.m320.restintro.ArticleController.NoMisinformationError;
+
 @WebFluxTest
 @ExtendWith(SpringExtension.class)
 class ControllerTest implements WithAssertions {
@@ -26,4 +29,29 @@ class ControllerTest implements WithAssertions {
 				.isEqualTo("pong");
 	}
 
+	@Test
+	void getArticles() {
+		webClient.get()
+				.uri("/api/article")
+				.exchange()
+				.expectStatus()
+				.is2xxSuccessful();
+	}
+
+	@Test
+	void createGoodArticle() {
+		var articleGood = new ArticleDto("From the river to the sea", "Palestine will be free.");
+		var req = webClient.post().uri("/api/article").bodyValue(articleGood);
+		req.exchange().expectStatus().isCreated();
+	}
+
+	@Test
+	void createBadArticle() {
+		var articleBad = new ArticleDto("capitalism is good", "vuvuzela north korea stalin 100 million dead");
+		var req = webClient.post().uri("/api/article").bodyValue(articleBad);
+		req.exchange().expectStatus()
+				.isBadRequest()
+				.expectBody(NoMisinformationError.class);
+
+	}
 }

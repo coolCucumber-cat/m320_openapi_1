@@ -32,43 +32,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SampleError"
-  /api/pony:
+  /api/article:
     get:
       responses:
         200:
-          description: got some ponies
+          description: got some articles
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/PonyDto"
+                  $ref: "#/components/schemas/ArticleDto"
     post:
       responses:
         200:
-          description: made a new pony
-          content:
-            text/plain:
-              schema:
-                type: string
-        400:
-          description: couldnt make a new pony
+          description: made a new article
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NoUglyPoniesException"
+                $ref: "#/components/schemas/ArticleDto"
+        400:
+          description: no misinformation is allowed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NoMisinformationError"
 
 # components contain reusable definitions
 # https://swagger.io/specification/#components-object
 components:
   schemas:
-    PonyDto:
+    ArticleDto:
       properties:
-        name:
+        id:
+          type: integer
+        headline:
           type: string
-        color:
+        content:
           type: string
-    NoUglyPoniesException:
+        likes:
+          type: integer
+        dislikes:
+          type: integer
+        posted:
+          type: string
+          format: date
+    NoMisinformationError:
       properties:
         message:
           type: string
