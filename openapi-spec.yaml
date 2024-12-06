@@ -57,6 +57,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NoMisinformationError"
+    patch:
+      responses:
+        200:
+          description: updated an article
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleDto"
+        400:
+          description: no misinformation is allowed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NoMisinformationError"
+    delete:
+      responses:
+        204:
+          description: deleted an article
 
 # components contain reusable definitions
 # https://swagger.io/specification/#components-object
