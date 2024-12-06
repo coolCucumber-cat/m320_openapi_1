@@ -53,9 +53,9 @@ public class ArticleController {
 
 	@PutMapping("/api/article/{id}")
 	public ArticleDto put(@PathVariable int id, @RequestBody ArticleDto article) {
-		// if (NoMisinformationError.isMisinformation(article)) {
-		// throw new NoMisinformationError();
-		// }
+		if (NoMisinformationError.isMisinformation(article)) {
+			throw new NoMisinformationError();
+		}
 		var newArticle = new ArticleDto(id, article);
 		articles.put(id, newArticle);
 		return newArticle;
