@@ -5,12 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -40,51 +38,38 @@ public class ArticleController {
 		return articles.values().stream().toList();
 	}
 
-	@PostMapping
-	public ResponseEntity<ArticleDto> post(@RequestBody ArticleDto article) {
-		if (NoMisinformationError.isMisinformation(article)) {
-			throw new NoMisinformationError();
-		}
-		var id = articles.size();
-		ArticleDto newArticle = new ArticleDto(id, article);
-		articles.put(id, newArticle);
-		return ResponseEntity.status(HttpStatus.CREATED).body(newArticle);
-	}
+	// TODO: fetch by id
+	// TODO: search by attribute (like tag)
 
-	@PutMapping("/api/article/{id}")
-	public ArticleDto put(@PathVariable int id, @RequestBody ArticleDto article) {
+	@ResponseStatus(HttpStatus.CREATED)
+	@PostMapping
+	public ArticleDto post(@RequestBody ArticleDto article) {
 		if (NoMisinformationError.isMisinformation(article)) {
 			throw new NoMisinformationError();
 		}
+		// find a unique key, articles.size() would clash once an entry is deleted from the set
+		var id = articles.keySet().stream().max(Integer::compareTo).orElse(-1) + 1;
 		var newArticle = new ArticleDto(id, article);
 		articles.put(id, newArticle);
 		return newArticle;
 	}
-	// @PatchMapping("/api/article/{id}")
-	// public ArticleDto patch(@PathVariable int id, @RequestBody ArticleDto
-	// article) {
-	// // if (NoMisinformationError.isMisinformation(article)) {
-	// // throw new NoMisinformationError();
-	// // }
-	// var newArticle = new ArticleDto(id, article);
-	// articles.put(id, newArticle);
-	// return newArticle;
-	// }
-	// @PatchMapping("/api/article/{id}")
-	// public ResponseEntity<ArticleDto> patch(@PathVariable int id, @RequestBody
-	// ArticleDto article) {
-	// if (NoMisinformationError.isMisinformation(article)) {
-	// throw new NoMisinformationError();
-	// }
-	// var newArticle = new ArticleDto(id, article);
-	// articles.put(newArticle.id, newArticle);
-	// return ResponseEntity.status(HttpStatus.OK).body(newArticle);
-	// }
 
-	@DeleteMapping("/api/article/{id}")
-	public ResponseEntity<ArticleDto> delete(@PathVariable int id) {
+	@PutMapping("{id}") // ...is appended to the @RequestMapping("/api/article") of the class
+	public ArticleDto put(@PathVariable int id, @RequestBody ArticleDto article) {
+		if (NoMisinformationError.isMisinformation(article)) {
+			throw new NoMisinformationError();
+		}
+		// are you sure that the id actually exists?
+		var newArticle = new ArticleDto(id, article);
+		articles.put(id, newArticle);
+		return newArticle;
+	}
+
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@DeleteMapping("{id}")
+	public void delete(@PathVariable int id) {
+		// are you sure that the id actually exists? ...articles.containsKey(id)
 		articles.remove(id);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 	}
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -101,6 +86,8 @@ public class ArticleController {
 	public record ArticleDto(@Nullable int id, String headline, String content, List<String> tags, int likes,
 			int dislikes,
 			java.util.Date posted) {
+		// java.util.Date is kinda considered legacy nowadays.
+		// Prefer modern variants like Instant or LocalDateTime.
 		public ArticleDto(int id, ArticleDto article) {
 			this(id, article.headline, article.content, article.tags, article.likes, article.likes, article.posted);
 		}
@@ -115,15 +102,6 @@ public class ArticleController {
 
 		public ArticleDto(String headline, String content, List<String> tags) {
 			this(0, headline, content, tags, 0, 0, new Date());
-		}
-
-		public ArticleDto(String headline, String content, List<String> tags, int likes, int dislikes) {
-			this(0, headline, content, tags, likes, dislikes, new Date());
-		}
-
-		public ArticleDto(String headline, String content, List<String> tags, int likes, int dislikes,
-				java.util.Date posted) {
-			this(0, headline, content, tags, likes, dislikes, posted);
 		}
 	}
 }

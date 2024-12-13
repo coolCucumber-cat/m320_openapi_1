@@ -57,6 +57,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NoMisinformationError"
+    # the endpoint PATCH /api/article does not exist, PATCH /api/article/api/article/{id} would exist however
+    # the same holds for DELETE, I guess this wasn't tested
     patch:
       responses:
         200:
@@ -81,13 +83,21 @@ paths:
 components:
   schemas:
     ArticleDto:
+      # TODO: add description
       properties:
         id:
+          # TODO: add examples to all properties
+          # maybe also readOnly: true
           type: integer
         headline:
           type: string
         content:
           type: string
+        tags:
+          type: array
+          items:
+            type: string
+            example: politics
         likes:
           type: integer
         dislikes:
@@ -95,7 +105,9 @@ components:
         posted:
           type: string
           format: date
+      # notice that no validation is applied at all to articles: it is allowe to have no headline for example
     NoMisinformationError:
+      # this is wrong: spring will convert it to a format similar to SampleError on the wire
       properties:
         message:
           type: string
