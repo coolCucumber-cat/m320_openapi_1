@@ -58,7 +58,6 @@ class ControllerTest implements WithAssertions {
 	void editGoodArticle() {
 		var articleGood = new ArticleDto("From the river to the sea", "Palestine will be free.");
 		var req = webClient.put().uri("/api/article/1").bodyValue(articleGood);
-		// var req = webClient.patch().uri("/api/article/1").bodyValue(articleGood);
 		var exchange = req.exchange();
 		exchange.expectStatus().is2xxSuccessful();
 	}
@@ -66,10 +65,15 @@ class ControllerTest implements WithAssertions {
 	@Test
 	void editBadArticle() {
 		var articleBad = new ArticleDto("capitalism is good", "vuvuzela north korea stalin 100 million dead");
-		var req = webClient.patch().uri("/api/article/1").bodyValue(articleBad);
+		var req = webClient.put().uri("/api/article/1").bodyValue(articleBad);
 		req.exchange().expectStatus()
 				.isBadRequest()
 				.expectBody(NoMisinformationError.class);
 
 	}
+
+	// TODO: test to delete an article
+	// TODO: test to delete an unknown id
+	// TODO: test to search by attribute (like tag)
+	// TODO: test to getch article by id
 }
